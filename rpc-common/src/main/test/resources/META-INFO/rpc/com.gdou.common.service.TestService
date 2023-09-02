@@ -1,0 +1,4 @@
+test1=com.gdou.common.service.TestServiceImpl1 #test1
+test2=com.gdou.common.service.TestServiceImpl2 #test2
+test3=com.gdou.common.service.TestServiceImpl3 #test3
+test4=com.gdou.common.service.TestServiceImpl3 #test4
