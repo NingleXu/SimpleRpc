@@ -89,6 +89,7 @@ public class ProviderApplication {
 
 
 consumer 模块
+
 ![image](https://github.com/Xzhhhhhh/SimpleRpc/assets/91795546/faed2a16-b372-4eb5-8667-a26e03efd26d)
 
 ```java
