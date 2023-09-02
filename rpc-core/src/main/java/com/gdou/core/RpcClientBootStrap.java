@@ -9,6 +9,7 @@ import com.gdou.register.center.ServiceDiscovery;
 import com.gdou.register.factory.ServiceDiscoveryFactory;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.DefaultPromise;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Proxy;
 import java.net.InetSocketAddress;
@@ -23,6 +24,7 @@ import static com.gdou.netty.server.RpcClientManager.group;
  * @author ningle
  * @version : RpcClientBootStrap.java, v 0.1 2023/09/01 14:13 ningle
  **/
+@Slf4j
 public class RpcClientBootStrap {
 
     private static volatile RpcClientBootStrap instance;
@@ -93,11 +95,12 @@ public class RpcClientBootStrap {
             // 发送消息
             serverChannel.writeAndFlush(rpcRequestMessage);
             // 等待结果
-            promise.await();
+            promise.await(2, TimeUnit.SECONDS);
             if (promise.isSuccess()) {
                 return promise.getNow();
             } else {
-                throw new RuntimeException(promise.cause());
+                log.error("服务{}远程调用失败,等待服务响应超时", serviceClass.getName());
+                return null;
             }
         }));
         return (T) proxyObj;
