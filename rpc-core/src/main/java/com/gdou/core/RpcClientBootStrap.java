@@ -93,7 +93,7 @@ public class RpcClientBootStrap {
             // 发送消息
             serverChannel.writeAndFlush(rpcRequestMessage);
             // 等待结果
-            promise.await(2,TimeUnit.SECONDS);
+            promise.await();
             if (promise.isSuccess()) {
                 return promise.getNow();
             } else {
