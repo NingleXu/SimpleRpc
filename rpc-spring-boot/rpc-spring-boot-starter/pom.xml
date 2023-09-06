@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.gdou</groupId>
+        <artifactId>rpc-spring-boot</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>rpc-spring-boot-starter</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- Spring Boot dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <optional>true</optional>
+            <exclusions>
+                <!-- Fix the bug of log4j refer:https://github.com/apache/logging-log4j2/pull/608 -->
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--    rpc    -->
+        <dependency>
+            <groupId>com.gdou</groupId>
+            <artifactId>rpc-core</artifactId>
+            <version>${SimpleRpc-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gdou</groupId>
+            <artifactId>rpc-config-spring</artifactId>
+            <version>${SimpleRpc-version}</version>
+        </dependency>
+
+    </dependencies>
+</project>

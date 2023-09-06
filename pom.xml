@@ -14,6 +14,8 @@
         <module>rpc-common</module>
         <module>rpc-test</module>
         <module>rpc-register</module>
+        <module>rpc-config</module>
+        <module>rpc-spring-boot</module>
     </modules>
 
     <properties>
@@ -27,10 +29,20 @@
         <nacos-version>1.3.0</nacos-version>
         <logback-version>1.2.3</logback-version>
         <junit-jupiter-version>5.8.1</junit-jupiter-version>
+        <spring_version>5.3.25</spring_version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- Spring -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring_version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
             <dependency>
                 <groupId>com.alibaba.nacos</groupId>
