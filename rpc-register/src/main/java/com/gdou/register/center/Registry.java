@@ -8,7 +8,10 @@ import java.util.Collection;
  * @version : Registry.java, v 0.1 2023/09/01 10:10 ningle
  **/
 public interface Registry {
-     void registerServer(String serverName, InetSocketAddress address);
 
-     void registerServer(Collection<String> serverName, InetSocketAddress address);
+    void connect();
+
+    void registerServer(String serverName, InetSocketAddress address);
+
+    void registerServer(Collection<String> serverName, InetSocketAddress address);
 }

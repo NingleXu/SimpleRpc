@@ -1,4 +1,4 @@
-package com.gdou.netty.protocol;
+package com.gdou.config.api.netty.protocol;
 
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 

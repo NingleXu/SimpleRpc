@@ -20,13 +20,16 @@ public class NacosRegistry extends AbstractRegistry {
 
     public NacosRegistry(InetSocketAddress address) {
         super(address);
+    }
+
+    @Override
+    public void connect() {
         log.info("SimpleRpc 开始连接注册中心...");
         namingService = NacosNamingServiceUtil.createNamingService(address);
 
         if (namingService == null) {
             throw new RuntimeException(String.format("无法链接nacos注册中心, ip:%s,port:%s", address.getHostName(), address.getPort()));
         }
-
         log.info("SimpleRpc 注册中心nacos连接成功！");
     }
 

@@ -23,9 +23,9 @@ import static com.gdou.common.constants.RpcConfigConstants.LOADBALANCE_KEY;
 @Slf4j
 public class NacosDiscoveryService extends AbstractServiceDiscovery {
 
-    private final NamingService namingService;
+    private NamingService namingService;
 
-    private String loadBalanceStrategy;
+    private final String loadBalanceStrategy;
 
     // 从注册中心获取 可用实例的重试次数
     private static final int retryTimes = 3;
@@ -35,14 +35,6 @@ public class NacosDiscoveryService extends AbstractServiceDiscovery {
 
     public NacosDiscoveryService(InetSocketAddress address) {
         super(address);
-        log.info("SimpleRpc 开始连接注册中心...");
-        namingService = NacosNamingServiceUtil.createNamingService(address);
-
-        if (namingService == null) {
-            throw new RuntimeException(String.format("无法链接nacos注册中心, ip:%s,port:%s", address.getHostName(), address.getPort()));
-        }
-        log.info("SimpleRpc 注册中心nacos连接成功！");
-
         // 利用配置文件和SPI获取负载均衡策略
         // 配置对应的负载均衡策略  默认随机
         loadBalanceStrategy = RpcConfigReader.getConfigProperty(LOADBALANCE_KEY, DEFAULT_LOADBALANCE);
@@ -50,6 +42,17 @@ public class NacosDiscoveryService extends AbstractServiceDiscovery {
                 .getExtensionLoader(LoadBalance.class)
                 .getExtension(loadBalanceStrategy);
         log.info("SimpleRpc 负载均衡策略为:" + loadBalanceStrategy);
+    }
+
+    @Override
+    public void connect() {
+        log.info("SimpleRpc 开始连接注册中心...");
+        namingService = NacosNamingServiceUtil.createNamingService(address);
+
+        if (namingService == null) {
+            throw new RuntimeException(String.format("无法链接nacos注册中心, ip:%s,port:%s", address.getHostName(), address.getPort()));
+        }
+        log.info("SimpleRpc 注册中心nacos连接成功！");
     }
 
     @Override

@@ -1,8 +1,8 @@
-package com.gdou.netty.server;
+package com.gdou.config.api.netty.server;
 
-import com.gdou.netty.handler.RpcRequestMessageHandler;
-import com.gdou.netty.protocol.MessageCodec;
-import com.gdou.netty.protocol.ProtocolFrameDecoder;
+import com.gdou.config.api.netty.handler.RpcRequestMessageHandler;
+import com.gdou.config.api.netty.protocol.MessageCodec;
+import com.gdou.config.api.netty.protocol.ProtocolFrameDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 
@@ -11,19 +11,25 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RpcServerManager {
-    public static Channel init() {
+
+    private static volatile Channel serverChannel;
+
+    public synchronized static Channel initIfNeed() {
+
+        if (serverChannel != null) {
+            return serverChannel;
+        }
+
         MessageCodec codecHandler = new MessageCodec();
         RpcRequestMessageHandler RPC_REQUEST_HANDLER = new RpcRequestMessageHandler();
 
         NioEventLoopGroup boss = new NioEventLoopGroup();
         NioEventLoopGroup works = new NioEventLoopGroup();
 
-        Channel channel = null;
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap()
                     .channel(NioServerSocketChannel.class)
@@ -38,10 +44,10 @@ public class RpcServerManager {
                         }
                     });
 
-            channel = serverBootstrap
+            serverChannel = serverBootstrap
                     .bind(0).sync()
                     .channel();
-            channel.closeFuture().addListener((ChannelFutureListener) channelFuture -> {
+            serverChannel.closeFuture().addListener((ChannelFutureListener) channelFuture -> {
                 boss.shutdownGracefully();
                 works.shutdownGracefully();
                 log.debug("server is close");
@@ -49,6 +55,6 @@ public class RpcServerManager {
         } catch (InterruptedException e) {
             log.debug("server error , {}", e.getMessage());
         }
-        return channel;
+        return serverChannel;
     }
 }

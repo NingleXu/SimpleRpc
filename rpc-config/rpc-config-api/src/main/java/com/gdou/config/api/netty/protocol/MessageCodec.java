@@ -1,4 +1,4 @@
-package com.gdou.netty.protocol;
+package com.gdou.config.api.netty.protocol;
 
 import com.gdou.common.message.Message;
 import com.gdou.common.serializer.SerializerType;

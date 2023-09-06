@@ -11,7 +11,7 @@ import java.net.InetSocketAddress;
  **/
 public abstract class AbstractRegistry implements Registry {
 
-    private InetSocketAddress address;
+    protected InetSocketAddress address;
 
     public AbstractRegistry(InetSocketAddress address) {
         this.address = address;

@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>rpc-config-spring</module>
+        <module>rpc-config-api</module>
     </modules>
     <artifactId>rpc-config</artifactId>
 

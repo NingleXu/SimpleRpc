@@ -1,6 +1,10 @@
 package com.gdou.test;
 
-import com.gdou.core.RpcServerBootStrap;
+import com.gdou.config.api.RpcBootStrap;
+import com.gdou.config.api.ServiceConfig;
+import com.gdou.config.api.ServiceConfigBuilder;
+import com.gdou.test.service.HelloService;
+import com.gdou.test.service.impl.HelloServiceImpl;
 
 import java.net.InetSocketAddress;
 
@@ -10,11 +14,16 @@ import java.net.InetSocketAddress;
  **/
 public class TestService {
     public static void main(String[] args) {
-        // 服务器端运行
-        RpcServerBootStrap.getInstance()
-                // 注册中心 目前仅支持 nacos
+        ServiceConfig<HelloService> serviceConfig = new ServiceConfigBuilder<HelloService>()
+                .group("")
+                .version("0.0.1")
+                .interfaceClass(HelloService.class)
+                .ref(new HelloServiceImpl())
+                .build();
+        RpcBootStrap
+                .getInstance()
                 .registry(new InetSocketAddress("localhost", 8848))
-                .start()
-                .await();
+                .service(serviceConfig)
+                .start();
     }
 }

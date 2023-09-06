@@ -20,13 +20,8 @@
     <dependencies>
         <dependency>
             <groupId>com.gdou</groupId>
-            <artifactId>rpc-netty</artifactId>
-            <version>${SimpleRpc-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.gdou</groupId>
-            <artifactId>rpc-register</artifactId>
-            <version>${SimpleRpc-version}</version>
+            <artifactId>rpc-config-api</artifactId>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 

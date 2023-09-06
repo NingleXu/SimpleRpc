@@ -30,14 +30,19 @@ public class RpcRequestMessage extends Message {
      * 方法参数值数组
      */
     private Object[] parameterValue;
+    /**
+     * rpc 服务的service唯一id
+     */
+    private String serviceId;
 
-    public RpcRequestMessage(int sequenceId, String interfaceName, String methodName, Class<?> returnType, Class[] parameterTypes, Object[] parameterValue) {
+    public RpcRequestMessage(int sequenceId, String interfaceName, String methodName, Class<?> returnType, Class[] parameterTypes, Object[] parameterValue, String serviceId) {
         super.setSequenceId(sequenceId);
         this.interfaceName = interfaceName;
         this.methodName = methodName;
         this.returnType = returnType;
         this.parameterTypes = parameterTypes;
         this.parameterValue = parameterValue;
+        this.serviceId = serviceId;
     }
 
     @Override

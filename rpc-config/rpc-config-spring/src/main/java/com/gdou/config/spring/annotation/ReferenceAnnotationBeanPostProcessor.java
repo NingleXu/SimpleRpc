@@ -1,7 +1,7 @@
 package com.gdou.config.spring.annotation;
 
 import com.gdou.common.annotations.RpcReference;
-import com.gdou.core.RpcClientBootStrap;
+import com.gdou.config.RpcClientBootStrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -238,16 +238,16 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
     }
 
     private Object doGetInjectedBean(Class<?> injectedType) {
-        String injectedBeanName = "Rpc:" + injectedType.getName();
-        // todo
-        Object proxyObject = RpcClientBootStrap
-                .getInstance()
-                .getProxy(injectedType);
-        if (!beanFactory.containsBean(injectedBeanName)) {
-            // 注册
-            beanFactory.registerSingleton(injectedBeanName, proxyObject);
-        }
+//        String injectedBeanName = "Rpc:" + injectedType.getName();
+//        // todo
+//        Object proxyObject = RpcClientBootStrap
+//                .getInstance()
+//                .getProxy(injectedType);
+//        if (!beanFactory.containsBean(injectedBeanName)) {
+//            // 注册
+//            beanFactory.registerSingleton(injectedBeanName, proxyObject);
+//        }
 
-        return proxyObject;
+        return null;
     }
 }

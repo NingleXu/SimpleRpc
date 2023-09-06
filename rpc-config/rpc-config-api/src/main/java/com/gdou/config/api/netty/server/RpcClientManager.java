@@ -1,15 +1,17 @@
-package com.gdou.netty.server;
+package com.gdou.config.api.netty.server;
 
-import com.gdou.netty.handler.RpcResponseMessageHandler;
-import com.gdou.netty.protocol.MessageCodec;
-import com.gdou.netty.protocol.ProtocolFrameDecoder;
+import com.gdou.config.api.RpcBootStrap;
+
+import com.gdou.config.api.netty.handler.RpcResponseMessageHandler;
+import com.gdou.config.api.netty.protocol.MessageCodec;
+import com.gdou.config.api.netty.protocol.ProtocolFrameDecoder;
+import com.gdou.register.center.ServiceDiscovery;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -23,6 +25,21 @@ public class RpcClientManager {
 
     public static NioEventLoopGroup group = new NioEventLoopGroup();
     public final static Map<String, Channel> channels = new ConcurrentHashMap<>();
+
+
+    public static Channel getServerChannelByLoadBalance(RpcBootStrap bootStrap, String remoteServiceId) {
+        Channel channel = null;
+
+        // 从负载均衡中心获取连接地址
+        ServiceDiscovery serviceDiscovery = bootStrap.configManager
+                .getServiceDiscovery();
+
+        while (channel == null) {
+            channel = getChannel(serviceDiscovery.getService(remoteServiceId));
+        }
+        return channel;
+
+    }
 
     public static Channel getChannel(InetSocketAddress inetSocketAddress) {
 

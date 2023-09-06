@@ -1,4 +1,4 @@
-package com.gdou.netty.config;
+package com.gdou.config.api.netty.config;
 
 
 import com.gdou.common.annotations.RpcService;

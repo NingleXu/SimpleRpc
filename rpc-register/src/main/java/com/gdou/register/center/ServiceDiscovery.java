@@ -9,4 +9,6 @@ import java.net.InetSocketAddress;
 public interface ServiceDiscovery {
     InetSocketAddress getService(String serviceName);
 
+    void connect();
+
 }

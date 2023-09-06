@@ -1,4 +1,4 @@
-package com.gdou.netty.handler;
+package com.gdou.config.api.netty.handler;
 
 
 import com.gdou.common.message.RpcResponseMessage;
