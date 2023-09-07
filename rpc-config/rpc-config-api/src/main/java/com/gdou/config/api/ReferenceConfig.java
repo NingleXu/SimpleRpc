@@ -3,15 +3,17 @@ package com.gdou.config.api;
 import com.gdou.common.annotations.RpcReference;
 import com.gdou.common.message.RpcRequestMessage;
 import com.gdou.common.utils.SequenceIDGenerator;
-import com.gdou.config.AbstractConfig;
-import com.gdou.config.metadata.ServiceMetadata;
+import com.gdou.common.config.AbstractConfig;
+import com.gdou.common.config.ConfigNameGenerator;
 import com.gdou.config.api.netty.handler.RpcResponseMessageHandler;
 import com.gdou.config.api.netty.server.RpcClientManager;
+import com.gdou.common.config.metadata.ServiceMetadata;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.DefaultPromise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +27,6 @@ public class ReferenceConfig<T> extends AbstractConfig {
 
     // 服务元数据
     private ServiceMetadata metadata;
-
     /**
      * 代理类
      */
@@ -76,7 +77,7 @@ public class ReferenceConfig<T> extends AbstractConfig {
         ClassLoader classLoader = serviceType.getClassLoader();
         Class<?>[] interfaces = new Class[]{serviceType};
 
-        String remoteServiceId = metadata.generateServiceId();
+        String remoteServiceName = ConfigNameGenerator.generaConfigName(metadata);
 
         Object proxyObj = Proxy.newProxyInstance(classLoader, interfaces, ((proxy, method, args) -> {
             int sequenceId = SequenceIDGenerator.nextId();
@@ -88,7 +89,7 @@ public class ReferenceConfig<T> extends AbstractConfig {
                     method.getReturnType(),
                     method.getParameterTypes(),
                     args,
-                    remoteServiceId
+                    remoteServiceName
             );
 
 
@@ -103,7 +104,7 @@ public class ReferenceConfig<T> extends AbstractConfig {
             }
 
             Channel serverChannelByLoadBalance = RpcClientManager
-                    .getServerChannelByLoadBalance(bootStrap, remoteServiceId);
+                    .getServerChannelByLoadBalance(bootStrap, remoteServiceName);
 
 
             // 发送消息
@@ -121,7 +122,11 @@ public class ReferenceConfig<T> extends AbstractConfig {
     }
 
     public String getId() {
-        return metadata.generateServiceId();
+        return ConfigNameGenerator.generaConfigName(metadata);
     }
 
+    @PostConstruct
+    public void addIntoConfigManager() {
+        RpcBootStrap.getInstance().configManager.addRefer(this);
+    }
 }

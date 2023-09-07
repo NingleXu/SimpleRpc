@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>rpc-core</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>rpc-core</name>
     <url>http://maven.apache.org</url>

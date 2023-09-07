@@ -1,6 +1,6 @@
 package com.gdou.config.api;
 
-import com.gdou.config.metadata.ServiceMetadata;
+import com.gdou.common.config.metadata.ServiceMetadata;
 
 /**
  * @author ningle
@@ -28,7 +28,7 @@ public class ReferenceConfigBuilder<T> {
         return this;
     }
 
-    public ReferenceConfigBuilder<T> interfaceClass(Class<T> interfaceClazz) {
+    public ReferenceConfigBuilder<T> interfaceClass(Class<?> interfaceClazz) {
         this.serviceType = interfaceClazz;
         return this;
     }

@@ -28,14 +28,7 @@
         <!--    rpc    -->
         <dependency>
             <groupId>com.gdou</groupId>
-            <artifactId>rpc-core</artifactId>
-            <version>${SimpleRpc-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.gdou</groupId>
             <artifactId>rpc-config-spring</artifactId>
-            <version>${SimpleRpc-version}</version>
         </dependency>
-
     </dependencies>
 </project>

@@ -1,4 +1,4 @@
-package com.gdou.config;
+package com.gdou.common.config;
 
 /**
  * 抽象的服务类

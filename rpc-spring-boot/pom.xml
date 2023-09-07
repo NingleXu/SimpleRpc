@@ -8,6 +8,9 @@
         <artifactId>SimpleRpc</artifactId>
         <version>0.0.1</version>
     </parent>
+    <modules>
+        <module>rpc-spring-boot-starter</module>
+    </modules>
     <packaging>pom</packaging>
     <artifactId>rpc-spring-boot</artifactId>
 
@@ -23,6 +26,12 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.gdou</groupId>
+                <artifactId>rpc-config-spring</artifactId>
+                <version>${SimpleRpc-version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

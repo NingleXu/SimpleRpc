@@ -1,4 +1,4 @@
-package com.gdou.config;
+package com.gdou.common.config;
 
 /**
  * 抽象的服务config类
@@ -9,6 +9,4 @@ package com.gdou.config;
 public abstract class AbstractServiceConfig extends AbstractConfig {
 
     public abstract void export();
-
-
 }

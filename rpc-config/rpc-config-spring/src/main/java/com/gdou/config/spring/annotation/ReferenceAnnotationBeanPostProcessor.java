@@ -1,7 +1,8 @@
 package com.gdou.config.spring.annotation;
 
 import com.gdou.common.annotations.RpcReference;
-import com.gdou.config.RpcClientBootStrap;
+import com.gdou.config.api.ReferenceConfig;
+import com.gdou.config.api.ReferenceConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.core.BridgeMethodResolver;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
@@ -31,11 +33,15 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.gdou.common.config.ConfigNameGenerator.generaReferenceConfigName;
+import static org.springframework.core.annotation.AnnotationUtils.getAnnotationAttributes;
+
 /**
  * @author ningle
  * @version : RpcReferenceAnnotationBeanPostProcessor.java, v 0.1 2023/09/05 16:18 ningle
  **/
 public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements BeanFactoryAware {
+    public static final String BEAN_NAME = "referenceAnnotationBeanPostProcessor";
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceAnnotationBeanPostProcessor.class);
     Set<Class<? extends Annotation>> referenceAnnotationTypes = new HashSet<>(4);
 
@@ -113,7 +119,9 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
                         }
                         return;
                     }
-                    currElements.add(new AnnotatedFieldElement(field));
+                    // 获取注解上的属性
+                    AnnotationAttributes annotationAttributes = getAnnotationAttributes(field, field.getAnnotation(RpcReference.class));
+                    currElements.add(new AnnotatedFieldElement(field, annotationAttributes));
                 }
             });
 
@@ -136,8 +144,10 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
                                     method);
                         }
                     }
+                    // 获取注解上的属性
+                    AnnotationAttributes annotationAttributes = getAnnotationAttributes(method, method.getAnnotation(RpcReference.class));
                     PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
-                    currElements.add(new AnnotatedMethodElement(method, pd));
+                    currElements.add(new AnnotatedMethodElement(method, pd, annotationAttributes));
                 }
             });
 
@@ -174,9 +184,12 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
         private final Field field;
         private volatile Object bean;
 
-        protected AnnotatedFieldElement(Field field) {
+        private final AnnotationAttributes attributes;
+
+        protected AnnotatedFieldElement(Field field, AnnotationAttributes attributes) {
             super(field, null);
             this.field = field;
+            this.attributes = attributes;
         }
 
         @Override
@@ -184,7 +197,7 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
 
             Class<?> injectedType = field.getType();
 
-            Object injectedObject = getInjectedObject(injectedType);
+            Object injectedObject = getInjectedObject(injectedType, attributes);
 
             ReflectionUtils.makeAccessible(field);
 
@@ -202,9 +215,12 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
         private final Method method;
         private volatile Object bean;
 
-        protected AnnotatedMethodElement(Method method, PropertyDescriptor pd) {
+        private final AnnotationAttributes attributes;
+
+        protected AnnotatedMethodElement(Method method, PropertyDescriptor pd, AnnotationAttributes attributes) {
             super(method, pd);
             this.method = method;
+            this.attributes = attributes;
         }
 
         @Override
@@ -212,7 +228,7 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
 
             Class<?> injectedType = pd.getPropertyType();
 
-            Object injectedObject = getInjectedObject(injectedType);
+            Object injectedObject = getInjectedObject(injectedType, attributes);
 
             ReflectionUtils.makeAccessible(method);
 
@@ -222,14 +238,15 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
 
     }
 
-    private Object getInjectedObject(Class<?> injectedType) {
+    private Object getInjectedObject(Class<?> injectedType, AnnotationAttributes attributes) {
 
-        String cachedKey = "Rpc:" + injectedType.getName();
+        String cachedKey = injectedType.getName() +
+                "#attributest" + attributes;
 
         Object injectedObject = injectedObjectsCache.get(cachedKey);
 
         if (injectedObject == null) {
-            injectedObject = doGetInjectedBean(injectedType);
+            injectedObject = doGetInjectedBean(injectedType, attributes);
             // Customized inject-object if necessary
             injectedObjectsCache.putIfAbsent(cachedKey, injectedObject);
         }
@@ -237,17 +254,39 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
         return injectedObject;
     }
 
-    private Object doGetInjectedBean(Class<?> injectedType) {
-//        String injectedBeanName = "Rpc:" + injectedType.getName();
-//        // todo
-//        Object proxyObject = RpcClientBootStrap
-//                .getInstance()
-//                .getProxy(injectedType);
-//        if (!beanFactory.containsBean(injectedBeanName)) {
-//            // 注册
-//            beanFactory.registerSingleton(injectedBeanName, proxyObject);
-//        }
+    private Object doGetInjectedBean(Class<?> injectedType, AnnotationAttributes attributes) {
+        // spring中 bean引用bean的名称
+        String referenceBeanName = generaReferenceConfigName(injectedType, attributes.getString("version"), attributes.getString("group"));
 
-        return null;
+        // 构建 referenceConfig
+        ReferenceConfig<?> referenceConfig =
+                buildReferenceConfig(referenceBeanName, injectedType, attributes);
+
+        registerReferenceConfig(referenceBeanName, referenceConfig);
+
+        return referenceConfig.get();
+    }
+
+    private void registerReferenceConfig(String referenceBeanName, ReferenceConfig<?> referenceConfig) {
+        if (!beanFactory.containsBean(referenceBeanName)) {
+            beanFactory.registerSingleton(referenceBeanName, referenceConfig);
+        }
+    }
+
+    ConcurrentHashMap<String, ReferenceConfig<?>> referenceConfigCache = new ConcurrentHashMap<>();
+
+    private ReferenceConfig<?> buildReferenceConfig(String referenceBeanName, Class<?> injectedType, AnnotationAttributes attributes) {
+        ReferenceConfig<?> referenceConfig = referenceConfigCache.get(referenceBeanName);
+
+        if (referenceConfig == null) {
+            referenceConfig = new ReferenceConfigBuilder<>()
+                    .version(attributes.getString("version"))
+                    .group(attributes.getString("group"))
+                    .interfaceClass(injectedType)
+                    .build();
+            referenceConfigCache.put(referenceBeanName, referenceConfig);
+        }
+
+        return referenceConfig;
     }
 }

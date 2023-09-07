@@ -6,7 +6,10 @@ import java.lang.annotation.*;
  * @author ningle
  * @version : EnableRpc.java, v 0.1 2023/09/05 15:19 ningle
  **/
+@Inherited
 @Documented
+@EnableRpcConfig
+@RpcComponentScan
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnableRpc {

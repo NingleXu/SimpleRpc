@@ -1,4 +1,4 @@
-package com.gdou.config.metadata;
+package com.gdou.common.config.metadata;
 
 /**
  * @author ningle
@@ -40,9 +40,5 @@ public class ServiceMetadata {
         this.version = version;
         this.group = group;
         this.serviceType = serviceType;
-    }
-
-    public String generateServiceId() {
-        return this.serviceType.getName() + "-" + this.getVersion() + "-" + this.getGroup();
     }
 }

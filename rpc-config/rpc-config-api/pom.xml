@@ -8,7 +8,7 @@
         <artifactId>rpc-config</artifactId>
         <version>0.0.1</version>
     </parent>
-
+    <packaging>jar</packaging>
     <artifactId>rpc-config-api</artifactId>
 
     <properties>

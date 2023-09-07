@@ -1,6 +1,6 @@
 package com.gdou.config.api;
 
-import com.gdou.config.metadata.ServiceMetadata;
+import com.gdou.common.config.metadata.ServiceMetadata;
 
 /**
  * @author ningle

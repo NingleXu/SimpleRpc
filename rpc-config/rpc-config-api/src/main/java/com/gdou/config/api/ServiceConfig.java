@@ -1,11 +1,12 @@
 package com.gdou.config.api;
 
-import com.gdou.config.AbstractServiceConfig;
-import com.gdou.config.metadata.ServiceMetadata;
+import com.gdou.common.config.AbstractServiceConfig;
+import com.gdou.common.config.ConfigNameGenerator;
+import com.gdou.common.config.metadata.ServiceMetadata;
 import com.gdou.config.api.netty.server.RpcServerManager;
 import io.netty.channel.Channel;
 
-import java.lang.reflect.InvocationTargetException;
+import javax.annotation.PostConstruct;
 import java.net.InetSocketAddress;
 
 /**
@@ -21,6 +22,9 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     // 代理对象
     private T ref;
+
+    public ServiceConfig() {
+    }
 
     public ServiceConfig(ServiceMetadata metadata, T ref) {
         this.metadata = metadata;
@@ -44,7 +48,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     }
 
     public String getId() {
-        return metadata.generateServiceId();
+        return ConfigNameGenerator.generaConfigName(metadata);
     }
 
     @Override
@@ -61,5 +65,12 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         // 注册到注册中心
         bootStrap.configManager
                 .getRegistry().registerServer(getId(), (InetSocketAddress) serverChannel.localAddress());
+    }
+
+    @PostConstruct
+    public void addIntoConfigManager() {
+        RpcBootStrap
+                .getInstance()
+                .configManager.addService(this);
     }
 }
